@@ -7,74 +7,95 @@ import (
 	"os/signal"
 	"syscall"
 
+	// ---------- WhatsMeow ----------
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	"go.mau.fi/whatsmeow/types/events"
 	waLog "go.mau.fi/whatsmeow/util/log"
 
- "github.com/mdp/qrterminal/v3"
+	// ---------- QR code ----------
+	"github.com/mdp/qrterminal/v3"
+
+	// ---------- Driver SQLite ----------
+	// Importação em branco apenas para registrar o driver com database/sql.
+	_ "github.com/mattn/go-sqlite3"
 )
 
+// -----------------------------------------------------------------------------
+// Manipulador de eventos da WhatsMeow
 func eventHandler(evt interface{}) {
 	switch v := evt.(type) {
 	case *events.Message:
-		fmt.Println("Received a message!", v.Message.GetConversation())
+		fmt.Println("Mensagem recebida:", v.Message.GetConversation())
 	}
 }
 
+// -----------------------------------------------------------------------------
+// Função principal
 func main() {
-	// |------------------------------------------------------------------------------------------------------|
-	// | NOTE: You must also import the appropriate DB connector, e.g. github.com/mattn/go-sqlite3 for SQLite |
-	// |------------------------------------------------------------------------------------------------------|
-
+	// Log do banco (nível DEBUG opcional)
 	dbLog := waLog.Stdout("Database", "DEBUG", true)
+
+	// Contexto padrão
 	ctx := context.Background()
-	container, err := sqlstore.New(ctx, "sqlite3", "file:examplestore.db?_foreign_keys=on", dbLog)
+
+	// Cria o container de armazenamento usando SQLite
+	container, err := sqlstore.New(
+		ctx,
+		"sqlite3",                                 // nome do driver (registrado acima)
+		"file:examplestore.db?_foreign_keys=on",   // DSN
+		dbLog,
+	)
 	if err != nil {
 		panic(err)
 	}
-	// If you want multiple sessions, remember their JIDs and use .GetDevice(jid) or .GetAllDevices() instead.
+
+	// Obtém o primeiro dispositivo armazenado (ou cria um novo)
 	deviceStore, err := container.GetFirstDevice(ctx)
 	if err != nil {
 		panic(err)
 	}
+
+	// Log do cliente WhatsMeow
 	clientLog := waLog.Stdout("Client", "DEBUG", true)
 	client := whatsmeow.NewClient(deviceStore, clientLog)
+
+	// Registra o handler de eventos
 	client.AddEventHandler(eventHandler)
 
+	// -------------------------------------------------------------------------
+	// Primeiro acesso → login via QR code
 	if client.Store.ID == nil {
-		// No ID stored, new login
 		qrChan, _ := client.GetQRChannel(context.Background())
-		err = client.Connect()
-		if err != nil {
+
+		// Conecta (dispara o evento de QR)
+		if err = client.Connect(); err != nil {
 			panic(err)
 		}
+
+		// Processa os eventos de QR ou de login concluído
 		for evt := range qrChan {
 			if evt.Event == "code" {
-
-   // Gera o QR no terminal usando blocos “half”
-    qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
-
-				// Render the QR code here
-				// e.g. qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
-				// or just manually `echo 2@... | qrencode -t ansiutf8` in a terminal
-				fmt.Println("QR code:", evt.Code)
+				// Exibe o QR no terminal usando blocos “half”
+				qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
+				fmt.Println("\nEscaneie o QR acima com o WhatsApp.")
 			} else {
-				fmt.Println("Login event:", evt.Event)
+				fmt.Println("Evento de login:", evt.Event)
 			}
 		}
 	} else {
-		// Already logged in, just connect
-		err = client.Connect()
-		if err != nil {
+		// Sessão já existente – só conecta
+		if err = client.Connect(); err != nil {
 			panic(err)
 		}
 	}
 
-	// Listen to Ctrl+C (you can also do something else that prevents the program from exiting)
+	// -------------------------------------------------------------------------
+	// Mantém o programa vivo até receber Ctrl+C (SIGINT/SIGTERM)
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 
+	// Desconecta antes de encerrar
 	client.Disconnect()
 }
