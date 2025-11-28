@@ -41,7 +41,7 @@ const onDemandMap = new Map<string, string>()
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 const question = (text: string) => new Promise<string>((resolve) => rl.question(text, resolve))
 
-/ 1️⃣  Prefixo configurável
+// 1️⃣  Prefixo configurável
 // ---------------------------------------------------
 const COMMAND_PREFIX = '!';   // pode mudar para '/' ou outro caractere
 
