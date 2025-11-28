@@ -197,7 +197,7 @@ const App = async () => {
           if (cmd) {
             // Só aceita abrir/fechar em grupos onde o bot for admin
             if (isGroup) {
-              const admin = await try {
+              const admin = try {
     const meta = await sock.groupMetadata(groupJid);
     const myJid = sock.user?.id ?? '';
     // Se o bot for dono do grupo
