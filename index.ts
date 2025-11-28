@@ -75,7 +75,7 @@ const question = (text: string) =>
 /********************************************************************
  *  PREFIXO CONFIGURÁVEL
  ********************************************************************/
-const COMMAND_PREFIX = '!'; // altere para '/' ou outro caractere se desejar
+const COMMAND_PREFIX = '/'; // altere para '/' ou outro caractere se desejar
 
 /********************************************************************
  *  FUNÇÃO AUXILIAR: extrai comando após o prefixo
