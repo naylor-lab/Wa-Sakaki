@@ -139,7 +139,7 @@ function parseCommand(text: string): string | null {
 async function openGroup(jid: string) {
   // false → modo livre (todos podem enviar)
   await sock.groupSettingUpdate(jid, 'not_announcement')
-  await sock.sendMessage(jid, {
+  await sock.sendMessageWTyping(jid, {
     text: '🔓 Grupo aberto! Todos podem conversar novamente.',
   });
   console.log(`✅ Grupo ${jid} aberto`);
@@ -149,7 +149,7 @@ async function closeGroup(jid: string) {
   // true → modo anúncio (só admins podem enviar)
   await sock.groupSettingUpdate(jid, 'announcement')
 
-  await sock.sendMessage(jid, {
+  await sock.sendMessageWTyping(jid, {
     text: '🔒 Grupo fechado! Apenas administradores podem enviar mensagens.',
   });
   console.log(`✅ Grupo ${jid} fechado`);
@@ -216,15 +216,14 @@ async function closeGroup(jid: string) {
           // Exemplo de menu (descomente se quiser usar)
           /*
           if (text === 'menu') {
-            await sendMessageWTyping(
-              {
+            await sendMessageWTyping(remoteJid,
+{
                 image: {
                   url:
                     'https://raw.githubusercontent.com/naylor-lab/Zenkai-Ethernal-whatsap.default/refs/heads/main/Files/Menu/homeMenu.jpg',
                 },
                 caption: '> Menu:\\n\\n/Manager\\n/Services\\n/Help',
               },
-              remoteJid
             );
           }
           */
