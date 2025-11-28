@@ -86,23 +86,7 @@ function parseCommand(text: string): string | null {
   return trimmed.slice(COMMAND_PREFIX.length).toLowerCase(); // ex.: "open_group"
 }
 
-/********************************************************************
- *  FUNÇÃO AUXILIAR: verifica se o bot é admin no grupo
- ********************************************************************/
-async function isBotAdmin(groupJid: string): Promise<boolean> {
-  try {
-    const meta = await sock.groupMetadata(groupJid);
-    const myJid = sock.user?.id ?? '';
-    // Se o bot for dono do grupo
-    if (meta.owner === myJid) return true;
-    // Procura na lista de participantes
-    const participant = meta.participants.find((p) => p.id === myJid);
-    return participant?.admin ?? false;
-  } catch (e) {
-    console.error('Erro ao checar admin do grupo', groupJid, e);
-    return false;
-  }
-}
+
 
 /********************************************************************
  *  FUNÇÕES DE CONTROLE DO GRUPO (abre/fecha)
@@ -213,7 +197,18 @@ const App = async () => {
           if (cmd) {
             // Só aceita abrir/fechar em grupos onde o bot for admin
             if (isGroup) {
-              const admin = await isBotAdmin(remoteJid);
+              const admin = await try {
+    const meta = await sock.groupMetadata(groupJid);
+    const myJid = sock.user?.id ?? '';
+    // Se o bot for dono do grupo
+    if (meta.owner === myJid) return true;
+    // Procura na lista de participantes
+    const participant = meta.participants.find((p) => p.id === myJid);
+    return participant?.admin ?? false;
+  } catch (e) {
+    console.error('Erro ao checar admin do grupo', groupJid, e);
+    return false;
+  }
               if (!admin) {
                 await sock.sendMessage(remoteJid, {
                   text: '⚠️ Preciso ser administrador para abrir/fechar o grupo.',
