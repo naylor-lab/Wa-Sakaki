@@ -2,7 +2,7 @@ Template Wa-Sakaki: {
 
 Branches:
 
-<a href="#">TypeScript</a>
+<a href="https://github.com/naylor-lab/Wa-Sakaki/blob/typescript">TypeScript</a>
 
 <a href="#">Golang</a>
 
