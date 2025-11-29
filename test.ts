@@ -167,7 +167,7 @@ break;
  //To create link with code use 'https://chat.whatsapp.com/' + code
 const code = await sock.groupInviteCode(jid);
 await sendWithTyping(sock, jid, 
-{ text: `aqui está o link do grupo:${code}`});
+{ text: `Follow this link to join my WhatsApp group: https://chat.whatsapp.com/${code}`});
 break;
 
 
