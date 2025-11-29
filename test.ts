@@ -17,6 +17,7 @@ import makeWASocket, {
   WAMessageKey,
 } from '@whiskeysockets/baileys';
 import P from 'pino';
+import axios from 'axios';
 
 /********************************************************************
  *  CONSTANTES & CONFIG
