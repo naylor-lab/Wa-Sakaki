@@ -150,6 +150,13 @@ const App = async () => {
 // only allow admins to modify the group's settings
 await sock.groupSettingUpdate(jid, 'locked');
 break;
+
+
+ case "invite_group":
+ //To create link with code use 'https://chat.whatsapp.com/' + code
+const code = await sock.groupInviteCode(jid);
+await sendWithTyping(sock, jid, { text: 'aqui está o link do grupo:${code}'});
+
      }
 
       }
