@@ -157,6 +157,8 @@ break;
 const code = await sock.groupInviteCode(jid);
 await sendWithTyping(sock, jid, 
 { text: `aqui está o link do grupo:${code}`});
+break;
+
 
      }
 
