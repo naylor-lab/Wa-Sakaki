@@ -142,10 +142,22 @@ const App = async () => {
      switch (cmd) {
 
      case "menu":
+    const img = await axios.get('https://api.waifu.pics/sfw/neko')
+  .then(function (r) {
+    // handle success
+    console.log(r);
+    return r.url;
+  })
+  .catch(function (error) {
+    // handle error
+    console.log(error);
+  });
+
+
      await sendWithTyping(sock, jid, 
      { 
         image: {
-            url: 'https://api.waifu.pics/sfw/neko'
+            url: img
         },
         caption: '> Menu\n\n/Group'
 
