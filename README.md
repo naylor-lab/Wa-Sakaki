@@ -6,10 +6,6 @@ Branches:
 
 <a href="#">Golang</a>
 
-<a href="#">C-Sharp</a>
-
-<a href="#">JavaScript</a>
-
-<a href="#">Java</a>
+<a href="#">Java</>
 
 }
